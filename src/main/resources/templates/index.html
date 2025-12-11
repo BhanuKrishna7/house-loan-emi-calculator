@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>House Loan EMI Calculator</title>
+    <style>
+        /* Neon green theme */
+        :root{ --bg:#0b0f12; --neon:#00ff6a; --card:#091014; --muted:#9aa6a6 }
+        body{margin:0;font-family:Inter,Arial,Helvetica;background:linear-gradient(180deg,#030405 0%, #071018 100%);color:#e6f7ef}
+        .container{max-width:900px;margin:40px auto;padding:24px}
+        .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(0,255,106,0.12);box-shadow:0 8px 24px rgba(0,255,106,0.04);border-radius:12px;padding:28px}
+        h1{color:var(--neon);text-shadow:0 0 18px rgba(0,255,106,0.16)}
+        label{display:block;margin-top:12px;color:var(--muted);font-size:14px}
+        input[type="number"], input[type="text"]{width:100%;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:#071018;color:#e6f7ef}
+        .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .btn{display:inline-block;margin-top:16px;padding:12px 18px;border-radius:10px;background:transparent;border:1px solid var(--neon);color:var(--neon);cursor:pointer;font-weight:600;text-shadow:0 0 6px rgba(0,255,106,0.08)}
+        .result{margin-top:18px;padding:14px;border-radius:10px;background:rgba(0,255,106,0.03);border:1px solid rgba(0,255,106,0.06)}
+        footer{margin-top:18px;color:var(--muted);font-size:13px}
+
+        @media(max-width:600px){.row{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h1>House Loan EMI Calculator</h1>
+        <p>Calculate your monthly EMI and download a PDF report.</p>
+
+        <form th:action="/calculate" method="post">
+            <label for="name">Name (optional)</label>
+            <input type="text" id="name" name="name" th:value="${name}" />
+
+            <label for="principal">Loan Amount (Principal)</label>
+            <input type="number" id="principal" name="principal" step="0.01" required th:value="${principal}" />
+
+            <div class="row">
+                <div>
+                    <label for="rate">Annual Interest Rate (%)</label>
+                    <input type="number" id="rate" name="rate" step="0.01" required th:value="${rate}" />
+                </div>
+                <div>
+                    <label for="tenureMonths">Tenure (months)</label>
+                    <input type="number" id="tenureMonths" name="tenureMonths" required th:value="${tenure}" />
+                </div>
+            </div>
+
+            <button type="submit" class="btn">Calculate EMI</button>
+        </form>
+
+        <div th:if="${emi}" class="result">
+            <h3 style="color:var(--neon)">Results</h3>
+            <p><strong>EMI:</strong> <span th:text="${emi}"></span></p>
+            <p><strong>Total Payment:</strong> <span th:text="${totalPayment}"></span></p>
+            <p><strong>Total Interest:</strong> <span th:text="${totalInterest}"></span></p>
+
+            <form th:action="/downloadPdf" method="post" style="display:inline-block;margin-right:12px;">
+                <input type="hidden" name="principal" th:value="${principal}" />
+                <input type="hidden" name="rate" th:value="${rate}" />
+                <input type="hidden" name="tenureMonths" th:value="${tenure}" />
+                <input type="hidden" name="name" th:value="${name}" />
+                <button type="submit" class="btn">Download PDF Report</button>
+            </form>
+        </div>
+
+        <footer>
+            Tip: Try different tenures to see how EMI changes. Use the downloaded PDF for records.
+        </footer>
+    </div>
+</div>
+</body>
+</html>
